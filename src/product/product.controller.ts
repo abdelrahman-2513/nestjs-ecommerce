@@ -13,6 +13,7 @@ import { Types } from 'mongoose';
 import { IProduct } from './interface/product-interface';
 import { Roles } from 'src/auth/decorators';
 import { EUserRole } from 'src/auth/enum';
+import { FilterProductDTO } from './dtos/filter-product.dto';
 
 @Controller('product')
 export class ProductController {
@@ -20,6 +21,10 @@ export class ProductController {
   @Get('/')
   findProducts() {
     return this.productSVC.findProducts();
+  }
+  @Get('/filterd')
+  findFilteredProducts(filterDTO: FilterProductDTO) {
+    return this.productSVC.getFilteredProducts(filterDTO);
   }
   @Roles(EUserRole.ADMIN)
   @Post('/')

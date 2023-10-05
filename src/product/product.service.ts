@@ -10,6 +10,7 @@ import { CreateProductDTO } from './dtos/create-product.dto';
 import { Observable, catchError, map, of, switchMap } from 'rxjs';
 import { DatabaseService } from 'src/database/database.service';
 import { IProduct } from './interface/product-interface';
+import { FilterProductDTO } from './dtos/filter-product.dto';
 @Injectable()
 export class ProductService {
   constructor(
@@ -72,6 +73,27 @@ export class ProductService {
         console.log(e);
         if (e instanceof HttpException) throw e;
         throw new InternalServerErrorException('failed to update product!');
+      }),
+    );
+  }
+  public getFilteredProducts(
+    filterDTO: FilterProductDTO,
+  ): Observable<Product[]> {
+    const { search, category } = filterDTO;
+
+    return of(true).pipe(
+      switchMap(() => this.findProducts()),
+      map((allProdcuts) => {
+        if (search)
+          allProdcuts = allProdcuts.filter((product) => {
+            product.name.includes(search) ||
+              product.description.includes(search);
+          });
+        if (category)
+          allProdcuts = allProdcuts.filter(
+            (product) => product.category === category,
+          );
+        return allProdcuts;
       }),
     );
   }

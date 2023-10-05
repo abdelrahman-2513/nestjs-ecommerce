@@ -22,6 +22,7 @@ import { ATPayload } from './payloads/access-token-payload';
 import { AuthedUser } from './types';
 import { CreateUserDTO } from 'src/user/dtos/create-user-dto';
 import { RegisterDTO } from './dtos';
+import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
@@ -91,6 +92,14 @@ export class AuthService {
         secret: process.env.AT_SECRET,
         expiresIn: '20d',
       }),
-    ).pipe(map((AT: string) => new AuthedUser(user, AT)));
+    ).pipe(
+      map((AT: string) => new AuthedUser(user, AT)),
+
+      map((autheduser) => {
+        const response = Response;
+        response['cookie']('JWT', autheduser.access_token);
+        return autheduser;
+      }),
+    );
   }
 }
